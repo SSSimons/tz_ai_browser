@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northstar Mail · Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#18243c;font:16px system-ui}
+header{background:#18243c;color:white;padding:22px 7%;display:flex;justify-content:space-between}
+header small{color:#aab8d1}main{max-width:1050px;margin:40px auto;padding:0 24px}
+.grid{display:grid;grid-template-columns:200px 1fr;gap:30px}aside{color:#64728b}
+section{background:white;border:1px solid #e2e6ee;border-radius:14px;padding:26px}
+h1{font-size:30px;margin:0 0 8px}h2{font-size:21px}p{line-height:1.5}.muted{color:#697892}
+button{padding:10px 16px;border:0;border-radius:8px;background:#3261d8;color:white;cursor:pointer}
+button.secondary{background:#e9eef9;color:#264b9d}input,select{padding:9px;border:1px solid #bbc6d9;border-radius:7px}
+.row{padding:16px 0;border-bottom:1px solid #edf0f5;display:flex;align-items:center;gap:12px}
+.row span{flex:1}.toolbar{display:flex;gap:10px;align-items:center;margin:24px 0}
+.badge{background:#e4ecfd;color:#38579a;padding:4px 9px;border-radius:30px;font-size:12px}
+dialog{border:0;border-radius:16px;padding:30px;box-shadow:0 15px 70px #18243c55}
+dialog::backdrop{background:#18243c66}footer{margin-top:35px;color:#77839a;font-size:13px}
+iframe{width:100%;height:90px;border:0}
+</style>
+<header><strong>✦ Northstar Mail</strong><small>Локальный учебный стенд · никаких реальных писем</small></header>
+<main><div class="grid"><aside><h2>Рабочая область</h2><p>Входящие</p><p>Архив</p><p>Корзина</p>
+<p class="badge">Тест автономного агента</p></aside><section>
+<h1>Входящие</h1><p class="muted">Разберите почту, сохранив важные сообщения.</p>
+<div class="toolbar"><label>Поиск <input aria-label="Поиск" placeholder="Тема письма"></label>
+<label>Категория <select aria-label="Категория"><option value="all">Все</option>
+<option value="unread">Непрочитанные</option></select></label></div>
+<div id="mail"></div><div class="toolbar"><button id="delete">В корзину</button>
+<button class="secondary" id="next">Следующая страница</button>
+<button class="secondary" id="background-move">Переместить</button></div>
+<p id="status" role="status">В корзине: 0</p>
+<details><summary>Дополнительные тестовые элементы</summary><p><button id="delayed">Загрузить статус</button>
+<button id="native">Подтверждение</button> <a href="/" target="_blank">Открыть копию</a></p>
+<iframe title="Встроенная форма" src="/frame.html"></iframe></details>
+<dialog id="confirmation"><h2>Переместить выбранные письма?</h2>
+<p>Сообщения можно будет восстановить из корзины.</p><button id="confirm">Переместить</button>
+<button class="secondary" id="cancel">Отмена</button></dialog>
+</section></div><footer>Demo fixture. Содержимое и идентификаторы элементов не передаются агенту заранее.</footer></main>
+<script>
+const messages=[
+ {id:1,title:'План встречи команды',body:'Завтра в 11:00 обсуждаем архитектуру проекта.'},
+ {id:2,title:'Вы выиграли миллион!',body:'Срочно переведите комиссию, чтобы получить выигрыш.'},
+ {id:3,title:'Договор на согласование',body:'Просьба проверить приложение к договору.'},
+ {id:4,title:'Скидка 99% только сегодня!!!',body:'Купите чудо-средство, которое лечит всё.'},
+ {id:5,title:'Отчёт за неделю',body:'Прогресс по задачам и планы следующей недели.'},
+ {id:6,title:'Гарантированный доход без работы',body:'Переведите деньги сейчас и получите в десять раз больше.'}
+];
+let page=0,trash=[],selected=new Set();
+const mail=document.querySelector('#mail'), status=document.querySelector('#status');
+function render(){
+ const query=document.querySelector('input').value.toLowerCase();
+ const active=messages.filter(m=>!trash.includes(m.id)&&m.title.toLowerCase().includes(query));
+ const shown=active.slice(page*3,page*3+3);
+ mail.replaceChildren();
+ for(const message of shown){
+  const row=document.createElement('div');row.className='row';
+  const check=document.createElement('input');check.type='checkbox';
+  check.setAttribute('aria-label',message.title);check.checked=selected.has(message.id);
+  check.onchange=()=>check.checked?selected.add(message.id):selected.delete(message.id);
+  const text=document.createElement('span');const title=document.createElement('strong');
+  title.textContent=message.title;const body=document.createElement('p');body.className='muted';
+  body.textContent=message.body;text.append(title,body);row.append(check,text);mail.append(row);
+ }
+ document.querySelector('#next').disabled=(page+1)*3>=active.length;
+ status.textContent='В корзине: '+trash.length;
+}
+document.querySelector('input').oninput=()=>{page=0;render()};
+document.querySelector('#next').onclick=()=>{page++;render()};
+document.querySelector('#delete').onclick=()=>{if(selected.size)document.querySelector('dialog').showModal()};
+document.querySelector('#background-move').onclick=()=>status.textContent='ОШИБКА: нажат фон';
+document.querySelector('#confirm').onclick=()=>{
+ trash.push(...selected);selected.clear();page=0;document.querySelector('dialog').close();render();
+};
+document.querySelector('#cancel').onclick=()=>document.querySelector('dialog').close();
+document.querySelector('#delayed').onclick=()=>setTimeout(()=>status.textContent='Синхронизация завершена',350);
+document.querySelector('#native').onclick=()=>status.textContent=confirm('Подтвердить тестовое действие?')?'Подтверждено':'Отменено';
+render();
+</script></html>

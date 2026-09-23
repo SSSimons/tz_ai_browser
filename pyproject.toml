@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "stealth-browser-agent"
+version = "0.1.0"
+description = "Autonomous Python browser agent: OpenAI, MCP, Playwright and SeleniumBase CDP"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "openai>=2.0,<3",
+  "mcp>=1.20,<2",
+  "playwright>=1.51,<2",
+  "seleniumbase>=4.40,<5",
+  "pydantic-settings>=2.6,<3",
+  "rich>=13.9,<15",
+  "jsonschema>=4.23,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2", "ruff>=0.11,<1"]
+video = ["imageio[ffmpeg]>=2.37,<3", "pillow>=11,<13"]
+
+[project.scripts]
+browser-agent = "browser_agent.cli:main"
+browser-agent-mcp = "browser_agent.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/browser_agent"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["integration: real browser and MCP subprocess (opt-in)"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+

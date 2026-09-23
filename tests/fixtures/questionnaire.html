@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8"><title>Анкета</title>
+<style>textarea{display:block;width:500px;height:65px}section{margin:20px}</style>
+<h1>Ответьте на вопросы</h1>
+<form onsubmit="event.preventDefault(); document.querySelector('#status').textContent='Анкета отправлена'">
+<section><p>Опишите, пожалуйста, почему вас заинтересовала вакансия.</p>
+<div><textarea required placeholder="Писать тут"></textarea></div></section>
+<section><p>Укажите ваши зарплатные ожидания (в рублях, gross).</p>
+<div><textarea required placeholder="Писать тут"></textarea></div></section>
+<section><label>Формат работы <select onchange="document.querySelector('#extra').hidden=this.value!=='office'">
+<option value="">Выберите</option><option value="remote">Удалённо</option>
+<option value="office">Офис</option></select></label></section>
+<section id="extra" hidden><p>В каком городе готовы работать?</p><input placeholder="Писать тут"></section>
+<section><label><input type="checkbox" required>Данные проверены</label></section>
+<section><label>Одноразовый код <input autocomplete="one-time-code" value="123456"></label></section>
+<button type="button" onclick="const e=document.querySelector('textarea'); e.replaceWith(e.cloneNode(true))">Перерисовать</button>
+<button type="submit">Отправить</button>
+</form><p id="status">Не отправлено</p>
+</html>

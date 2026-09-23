@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8"><title>Длинная анкета</title>
+<h1>Длинная анкета с iframe</h1><form id="questions"></form>
+<iframe src="frame.html" title="Дополнительные сведения"></iframe>
+<script>
+for (let i = 0; i < 31; i++) {
+    const label = document.createElement('label');
+    label.textContent = `Вопрос ${i + 1}`;
+    label.append(document.createElement('input'));
+    document.querySelector('#questions').append(label, document.createElement('br'));
+}
+</script></html>
